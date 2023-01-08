@@ -11,12 +11,12 @@ public class GameManager : MonoBehaviour {
     public TMP_Text scoreText;
 
     //fading cover
-    public GameObject coverObj;
-    private Color coverColor;
-    private int fadeTime;
+    public Image coverImage;
+    private float fadeTime;
     private bool fading;
     private int targetAlpha;
     private float currentVelocity = 0;
+    private Color tempColor;
 
     //lasers
     public GameObject laser1;
@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour {
 
     public int score;
 
-    //LEVELS (based on score; 2 before)
+    //LEVELS (based on score)
     int lvl2 = 8;
     int lvl3 = 13;
     int lvl4 = 15;
@@ -60,8 +60,8 @@ public class GameManager : MonoBehaviour {
 
     void Awake() {
         //CHANGE DEFAULTS!
-        score = 13;
-        level = 3;
+        score = 10;
+        level = 2;
         loseTextObj.SetActive(false);
         rt.gameObject.SetActive(false);
     }
@@ -133,7 +133,10 @@ public class GameManager : MonoBehaviour {
     IEnumerator doLVL4() {
         level = 4;
         Debug.Log("LEVEL 4");
-        preFade(4);
+        preFade(6f);
+        yield return new WaitForSeconds(2f);
+        Debug.Log("lol");
+        //preFade(8);
         yield return null;
     }
 
@@ -191,17 +194,18 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    void preFade(int fadeTime) { //call this if u want to fade; timeFade from 0-1
+    void preFade(float fadeTime) { //call this if u want to fade, fadeTime = seconds
         this.fadeTime = fadeTime;
 
-        if (coverColor.a == 255) { //255 = max, all black
+        if (coverImage.color.a == 1) { //255 = max, all black
             targetAlpha = 0; //0 = transparent
         }
         else {
-            targetAlpha = 255;
+            targetAlpha = 1;
         }
 
-        coverColor = coverObj.GetComponent<Image>().color;
+        //coverImage = coverObj.GetComponent<Image>();
+        //Debug.Log(coverImage.color);
 
 
 
@@ -209,20 +213,23 @@ public class GameManager : MonoBehaviour {
     }
 
     void fadeCover() { //never directly call this except in update
+        tempColor = coverImage.color;
 
-        Color tempColor = coverColor;
-        tempColor.a = 1;
-        coverColor = tempColor;
-
-        coverColor.a = Mathf.SmoothDamp(coverColor.a, targetAlpha, ref currentVelocity, fadeTime);
-        if (coverColor.a >= targetAlpha) {
-            coverColor.a = 255;
+        tempColor.a = Mathf.MoveTowards(coverImage.color.a, targetAlpha, 1 / (fadeTime / Time.deltaTime));
+        if (targetAlpha == 1) {
+            if (tempColor.a >= targetAlpha) {
+                tempColor.a = 1;
+                fading = false;
+                Debug.Log("exiting fading");
+            }
+        }
+        else if (tempColor.a <= targetAlpha) {
+            tempColor.a = 0;
             fading = false;
             Debug.Log("exiting fading");
         }
-        Debug.Log(Mathf.SmoothDamp(coverColor.a, targetAlpha, ref currentVelocity, fadeTime));
+        coverImage.color = tempColor;
 
-        
     }
 
     void preLaser() {
