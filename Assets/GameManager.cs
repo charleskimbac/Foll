@@ -12,8 +12,7 @@ public class GameManager : MonoBehaviour {
 
     //fading cover
     public GameObject coverObj;
-    private Image cover;
-    private Color currentFade;
+    private Color coverColor;
     private int fadeTime;
     private bool fading;
     private int targetAlpha;
@@ -26,7 +25,7 @@ public class GameManager : MonoBehaviour {
     public GameObject laser4;
     private GameObject chosen;
     private Vector3 laserLocation = new Vector3(0, 0, 0);
-    private float xMaxBound;//bounds of the location where the prefab will spawn
+    private float xMaxBound; //bounds of the location where the prefab will spawn
     private float yMaxBound;
     private float xMinBound;
     private float yMinBound;
@@ -37,6 +36,7 @@ public class GameManager : MonoBehaviour {
     //LEVELS (based on score; 2 before)
     int lvl2 = 8;
     int lvl3 = 13;
+    int lvl4 = 15;
 
 
     //rotatingCam
@@ -60,8 +60,8 @@ public class GameManager : MonoBehaviour {
 
     void Awake() {
         //CHANGE DEFAULTS!
-        score = 12;
-        level = 2;
+        score = 13;
+        level = 3;
         loseTextObj.SetActive(false);
         rt.gameObject.SetActive(false);
     }
@@ -116,6 +116,9 @@ public class GameManager : MonoBehaviour {
         }
         else if (score == lvl3) {
             StartCoroutine(doLVL3());
+        }
+        else if (score == lvl4) {
+            StartCoroutine(doLVL4());
         }
     }
 
@@ -190,24 +193,36 @@ public class GameManager : MonoBehaviour {
 
     void preFade(int fadeTime) { //call this if u want to fade; timeFade from 0-1
         this.fadeTime = fadeTime;
+
+        if (coverColor.a == 255) { //255 = max, all black
+            targetAlpha = 0; //0 = transparent
+        }
+        else {
+            targetAlpha = 255;
+        }
+
+        coverColor = coverObj.GetComponent<Image>().color;
+
+
+
         fading = true;
     }
 
     void fadeCover() { //never directly call this except in update
-        if (cover.color.a == 1) {
-            targetAlpha = 0;
-        }
-        else {
-            targetAlpha = 1;
-        }
 
-        currentFade.a = Mathf.SmoothDamp(cover.color.a, targetAlpha, ref currentVelocity, fadeTime);
-        if (currentFade.a > 1) {
-            currentFade.a = 1;
+        Color tempColor = coverColor;
+        tempColor.a = 1;
+        coverColor = tempColor;
+
+        coverColor.a = Mathf.SmoothDamp(coverColor.a, targetAlpha, ref currentVelocity, fadeTime);
+        if (coverColor.a >= targetAlpha) {
+            coverColor.a = 255;
             fading = false;
             Debug.Log("exiting fading");
         }
-        cover.color = currentFade;
+        Debug.Log(Mathf.SmoothDamp(coverColor.a, targetAlpha, ref currentVelocity, fadeTime));
+
+        
     }
 
     void preLaser() {

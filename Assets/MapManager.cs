@@ -25,6 +25,9 @@ public class MapManager : MonoBehaviour
     int lvl3Speed = 15;
     WaitForSeconds lvl3Time = new WaitForSeconds(.8f);
 
+    int lvl4Speed = 16;
+    WaitForSeconds lvl4Time = new WaitForSeconds(.8f);
+
     void Start() {
         StartCoroutine(spawnObst());
     }
@@ -67,7 +70,9 @@ public class MapManager : MonoBehaviour
         else if (GM.getLevel() == 3) {
             return -lvl3Speed;
         }
-
+        else if (GM.getLevel() == 4) {
+            return -lvl4Speed;
+        }
 
 
 
@@ -84,7 +89,9 @@ public class MapManager : MonoBehaviour
         else if (GM.getLevel() == 3) {
             return lvl3Time;
         }
-
+        else if (GM.getLevel() == 4) {
+            return lvl4Time;
+        }
 
 
 
